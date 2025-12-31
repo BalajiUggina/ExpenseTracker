@@ -110,4 +110,14 @@ def expense_list(request):
   
     total= expenses.aggregate(total_amount=Sum('amount'))['total_amount'] or 0
     return render(request,'Expense/expenses.html',{'expenses':expenses,'total_amount':total,'categories':categories})
-    
+
+def delete_expense(request, id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    expense = Expense.objects.filter(id=id, user=request.user).first()
+    if not expense:
+        return redirect('expense-list')  # or show error
+
+    expense.delete()
+    return redirect('expense-list')
